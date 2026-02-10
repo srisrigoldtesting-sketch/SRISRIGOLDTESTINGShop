@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Sri Gold Testing Shop</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body { font-family: Arial, sans-serif; background: url('background.jpg') no-repeat center center fixed; background-size: cover; color: #000; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 100%; max-width: 600px; text-align: center; }
+        h1, h2 { color: #FFD700; }
+        form { display: flex; flex-direction: column; }
+        label { margin-top: 10px; text-align: left; }
+        input, textarea, button, select { margin-top: 5px; padding: 10px; border: 1px solid #FFD700; border-radius: 4px; }
+        button { background-color: #FFD700; color: #000; cursor: pointer; margin-top: 10px; }
+        button:hover { background-color: #FFA500; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #FFD700; padding: 8px; text-align: left; }
+        .hidden { display: none; }
+        #message { margin-top: 10px; color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Section -->
+        <div id="login">
+            <h1>Welcome to Sri Sri Gold Testing Shop</h1>
+            <form id="loginForm">
+                <label for="username">Username (Your Name for Customers, 'Bhanuchand' for Owner):</label>
+                <input type="text" id="username" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+                <button type="submit">Login</button>
+                <button type="button" id="signupBtn">Sign Up</button>
+                <button type="button" id="forgotBtn">Forgot Password</button>
+                <button type="button" id="fingerprintBtn">Login with Fingerprint</button>
+            </form>
+            <div id="message"></div>
+        </div>
+
+        <!-- Welcome Section -->
+        <div id="welcome" class="hidden">
+            <h1>Welcome, <span id="userName"></span>!</h1>
+            <p>Thank you for visiting Sri Sri Gold Testing Shop.</p>
+            <button onclick="showSection('details')">View Shop Details</button>
+            <button onclick="showSection('rates')">View Daily Rates</button>
+            <button onclick="showSection('appointments')">Book/View Appointments</button>
+            <button onclick="showSection('results')">View Test Results</button>
+            <button onclick="showSection('feedback')">Provide Feedback</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Shop Details Section -->
+        <div id="details" class="hidden">
+            <h1>Shop Details</h1>
+            <p><strong>Address:</strong> Opposite cloth complex, Kadapa main road, Mydukur.</p>
+            <p><strong>Contact:</strong> 7893552706, 9701758114</p>
+            <p><strong>Timings:</strong> 9:00 AM to 8:00 PM</p>
+            <button onclick="showSection('welcome')">Back to Welcome</button>
+        </div>
+
+        <!-- Daily Rates Section -->
+        <div id="rates" class="hidden">
+            <h1>Daily Gold Rates</h1>
+            <div id="rateDisplay">Loading...</div>
+            <button onclick="showSection('welcome')">Back to Welcome</button>
+        </div>
+
+        <!-- Appointments Section -->
+        <div id="appointments" class="hidden">
+            <h1>Appointments</h1>
+            <form id="appointmentForm">
+                <label for="date">Date:</label>
+                <input type="date" id="date" required>
+                <label for="time">Time:</label>
+                <input type="time" id="time" required>
+                <button type="submit">Book Appointment</button>
+            </form>
+            <div id="userAppointments">
+                <h2>Your Appointments</h2>
+                <ul id="appointmentList"></ul>
+            </div>
+            <div id="ownerAppointments" class="hidden">
+                <h2>All Appointments (Owner)</h2>
+                <table id="appointmentTable">
+                    <thead><tr><th>User</th><th>Date</th><th>Time</th><th>Actions</th></tr></thead>
+                    <tbody id="appointmentRows"></tbody>
+                </table>
+                <button onclick="addColumn('appointmentTable')">Add Column</button>
+            </div>
+            <button onclick="showSection('welcome')">Back to Welcome</button>
+        </div>
+
+        <!-- Test Results Section -->
+        <div id="results" class="hidden">
+            <h1>Test Results</h1>
+            <label for="serialNo">Enter Serial Number:</label>
+            <input type="text" id="serialNo">
+            <button onclick="searchResult()">Search</button>
+            <div id="resultDisplay"></div>
+            <div id="ownerResults" class="hidden">
+                <h2>Update Daily Test Results (Owner)</h2>
+                <form id="resultForm">
+                    <label for="newSerial">Serial No:</label>
+                    <input type="text" id="newSerial" required>
+                    <label for="resultText">Result:</label>
+                    <textarea id="resultText" required></textarea>
+                    <button type="submit">Add/Update Result</button>
+                </form>
+                <table id="resultTable">
+                    <thead><tr><th>Serial No</th><th>Result</th><th>Actions</th></tr></thead>
+                    <tbody id="resultRows"></tbody>
+                </table>
+                <button onclick="addColumn('resultTable')">Add Column</button>
+            </div>
+            <button onclick="showSection('welcome')">Back to Welcome</button>
+        </div>
+
+        <!-- Feedback Section -->
+        <div id="feedback" class="hidden">
+            <h1>Feedback</h1>
+            <form id="feedbackForm">
+                <label for="feedbackText">Your Feedback:</label>
+                <textarea id="feedbackText" rows="4" required></textarea>
+                <button type="submit">Submit Feedback</button>
+            </form>
+            <div id="feedbackList" class="hidden">
+                <h2>All Feedback (Owner)</h2>
+                <table id="feedbackTable">
+                    <thead><tr><th>User</th><th>Feedback</th><th>Date</th><th>Actions</th></tr></thead>
+                    <tbody id="feedbackRows"></tbody>
+                </table>
+                <button onclick="addColumn('feedbackTable')">Add Column</button>
+            </div>
+            <button onclick="showSection('welcome')">Back to Welcome</button>
+        </div>
+
+        <!-- Owner Dashboard -->
+        <div id="owner" class="hidden">
+            <h1>Owner Dashboard</h1>
+            <p>Total Customers: <span id="userCount">0</span></p>
+            <h2>Users Update</h2>
+            <table id="userTable">
+                <thead><tr><th>Username</th><th>Mobile</th><th>Password</th><th>Actions</th></tr></thead>
+                <tbody id="userRows"></tbody>
+            </table>
+            <button onclick="addColumn('userTable')">Add Column</button>
+            <h2>Daily Rates</h2>
+            <form id="rateForm">
+                <label for="rateText">Update Rates:</label>
+                <textarea id="rateText" required></textarea>
+                <button type="submit">Update Rates</button>
+            </form>
+            <div id="rateView"></div>
+            <h2>Edit Page Content</h2>
+            <form id="editForm">
+                <label for="page">Page:</label>
+                <select id="page"><option value="details">Shop Details</option></select>
+                <label for="content">New Content:</label>
+                <textarea id="content" required></textarea>
+                <button type="submit">Update</button>
+            </form>
+            <button onclick="showSection('welcome')">Back to Welcome</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, getDocs, query } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyATSwK1icdFnnjPpXM-niQ7bIHQllksAXk",
+            authDomain: "srisrigoldtesting-93ad4.firebaseapp.com",
+            projectId: "srisrigoldtesting-93ad4",
+            storageBucket: "srisrigoldtesting-93ad4.firebasestorage.app",
+            messagingSenderId: "590764493087",
+            appId: "1:590764493087:web:6ecc32589a1ae39049c82a",
+            measurementId: "G-4HKSMQ7D1M"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        // Load shared data
+        async function loadSharedData() {
+            const rateDoc = await getDoc(doc(db, 'rates', 'current'));
+            if (rateDoc.exists()) {
+                document.getElementById('rateDisplay').textContent = rateDoc.data().text;
+            }
+        }
+        loadSharedData();
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (username === 'Bhanuchand' && password === 'Prataap') {
+                currentUser = 'owner';
+                showSection('owner');
+                loadOwnerData();
+            } else {
+                const userDoc = await getDoc(doc(db, 'users', username));
+                if (userDoc.exists() && userDoc.data().password === password) {
+                    currentUser = username;
+                    showSection('welcome');
+                    document.getElementById('userName').textContent = username;
+                } else {
+                    document.getElementById('message').textContent = 'Invalid credentials!';
+                }
+            }
+        });
+
+        // Sign Up
+        document.getElementById('signupBtn').addEventListener('click', async function() {
+            const username = prompt('Username:');
+            const password = prompt('Password:');
+            const mobile = prompt('Mobile:');
+            if (username && password && mobile) {
+                await setDoc(doc(db, 'users', username), { password, mobile });
+                alert('Registered!');
+                loadOwnerData();
+            }
+        });
+
+        // Forgot Password
+        document.getElementById('forgotBtn').addEventListener('click', async function() {
+            const username = prompt('Username:');
+            const userDoc = await getDoc(doc(db, 'users', username));
+            if (userDoc.exists()) {
+                const newPass = prompt('Owner: New password:');
+                await updateDoc(doc(db, 'users', username), { password: newPass });
+                setTimeout(() => alert(`New password: ${newPass}`), 300000);
+                const code = Math.floor(1000 + Math.random() * 9000);
+                alert(`Code sent: ${code}`);
+                const enteredCode = prompt('Enter code:');
+                if (enteredCode == code) {
+                    const newPass2 = prompt('New password:');
+                    await updateDoc(doc(db, 'users', username), { password: newPass2 });
+                    alert('Reset successful!');
+                }
+            }
+        });
+
+        // Fingerprint
+        document.getElementById('fingerprintBtn').addEventListener('click', function() {
+            if (navigator.credentials) {
+                navigator.credentials.get({ publicKey: { challenge: new Uint8Array(32) } }).then(() => alert('Authenticated!')).catch(() => alert('Failed.'));
+            } else {
+                alert('Not supported.');
+            }
+        });
+
+        // Appointments
+        document.getElementById('appointmentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            await addDoc(collection(db, 'appointments'), { user: currentUser, date, time });
+            alert('Booked!');
+            loadAppointments();
+        });
+
+        // Results
+        async function searchResult() {
+            const serial = document.getElementById('serialNo').value;
+            const resultDoc = await getDoc(doc(db, 'results', serial));
+            document.getElementById('resultDisplay').textContent = resultDoc.exists() ? `Result: ${resultDoc.data().text}` : 'Not found.';
+        }
+
+        document.getElementById('resultForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const serial = document.getElementById('newSerial').value;
+            const text = document.getElementById('resultText').value;
+            await setDoc(doc(db, 'results', serial), { text });
+            alert('Updated!');
+        });
+
+        // Feedback
+        document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const text = document.getElementById('feedbackText').value;
+            await addDoc(collection(db, 'feedback'), { user: currentUser, text, date: new Date().toLocaleString() });
+            alert('Submitted!');
+            loadFeedback();
+        });
+
+        // Rates
+        document.getElementById('rateForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const text = document.getElementById('rateText').value;
+            await setDoc(doc(db, 'rates', 'current'), { text });
+            alert('Updated!');
+        });
+
+        // Load Owner Data
+        async function loadOwnerData() {
+            const usersSnapshot = await getDocs(collection(db, 'users'));
+            document.getElementById('userCount').textContent = usersSnapshot.size;
+            // Populate tables (similar for appointments, feedback, etc.)
+        }
+
+        // Other functions
+        function showSection(section) {
+            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(section).classList.remove('hidden');
+            if (section === 'owner') loadOwnerData();
+            // Show owner-specific sections
+        }
+
+        function logout() {
+            currentUser = null;
+            showSection('login');
+        }
+
+        function addColumn(tableId) {
+            const table = document.getElementById(tableId);
+            const header = table.querySelector('thead tr');
+            const newTh = document.createElement('th');
+            newTh.textContent = prompt('Column name:');
+            header.appendChild(newTh);
+        }
+
+        // Load functions for lists (appointments, feedback, etc.) - implement similarly
+    </script>
+</body>
+</html>
