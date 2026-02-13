@@ -1,0 +1,126 @@
+<<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Sri Gold Testing - Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #D4AF37; --dark: #1a1a1a; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: white; display: flex; flex-direction: column; align-items: center; margin: 0; }
+        .container { width: 90%; max-width: 400px; padding: 25px; margin-top: 30px; background: rgba(0,0,0,0.85); border-radius: 15px; border: 1px solid var(--gold); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 5px; border: 1px solid #444; background: #222; color: white; box-sizing: border-box; }
+        .btn-gold { background: var(--gold); color: var(--dark); font-weight: bold; padding: 14px; width: 100%; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px; transition: 0.3s; }
+        .btn-gold:hover { background: #b8952e; }
+        .toggle-link { font-size: 0.85em; color: var(--gold); cursor: pointer; margin-top: 15px; display: block; text-decoration: underline; }
+        #registerSection, #ownerDashboard, #usersUpdateSection { display: none; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 0.8em; }
+        th, td { border: 1px solid var(--gold); padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+
+<div id="loginSection" class="container">
+    <h2 style="color: var(--gold);">Sri Sri Gold Testing</h2>
+    <input type="text" id="loginUser" placeholder="Username / Mobile">
+    <input type="password" id="loginPass" placeholder="Password">
+    <button class="btn-gold" onclick="handleLogin()">Login</button>
+    <span class="toggle-link" onclick="showRegister()">New User? Register Here</span>
+</div>
+
+<div id="registerSection" class="container">
+    <h2 style="color: var(--gold);">Create Account</h2>
+    <input type="text" id="regName" placeholder="Full Name">
+    <input type="tel" id="regMobile" placeholder="Mobile Number">
+    <input type="password" id="regPass" placeholder="Set Password">
+    <button class="btn-gold" onclick="handleRegister()">Register & Install</button>
+    <span class="toggle-link" onclick="showLogin()">Back to Login</span>
+</div>
+
+<div id="ownerDashboard" class="container">
+    <h3 style="color: var(--gold);">Owner Panel: Bhanuchand</h3>
+    <button class="btn-gold" onclick="showUsers()">View Registered Users</button>
+    <button class="btn-gold">Update Gold Test Results</button>
+    <button class="btn-gold" onclick="logout()">Logout</button>
+</div>
+
+<div id="usersUpdateSection" class="container" style="max-width: 600px;">
+    <h3 style="color: var(--gold);">Users Update List</h3>
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Password</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="userListBody"></tbody>
+    </table>
+    <button class="btn-gold" onclick="hideUsers()">Back to Dashboard</button>
+</div>
+
+<script>
+    // Mock Database for demo (In real app, this connects to Firebase Firestore)
+    let users = [];
+
+    function showRegister() {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('registerSection').style.display = 'block';
+    }
+
+    function showLogin() {
+        document.getElementById('registerSection').style.display = 'none';
+        document.getElementById('loginSection').style.display = 'block';
+    }
+
+    function handleRegister() {
+        const name = document.getElementById('regName').value;
+        const mobile = document.getElementById('regMobile').value;
+        const pass = document.getElementById('regPass').value;
+
+        if(name && mobile && pass) {
+            users.push({ name, mobile, pass });
+            alert("Registration Successful! Please Login.");
+            showLogin();
+        } else {
+            alert("Please fill all fields");
+        }
+    }
+
+    function handleLogin() {
+        const u = document.getElementById('loginUser').value;
+        const p = document.getElementById('loginPass').value;
+
+        if(u === 'Bhanuchand' && p === 'Prataap') {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('ownerDashboard').style.display = 'block';
+        } else {
+            alert("Welcome Customer Dashboard coming soon!");
+        }
+    }
+
+    function showUsers() {
+        const body = document.getElementById('userListBody');
+        body.innerHTML = '';
+        users.forEach((user, index) => {
+            body.innerHTML += `<tr>
+                <td>${user.name}</td>
+                <td>${user.mobile}</td>
+                <td>${user.pass}</td>
+                <td><button onclick="resetPass('${user.mobile}')">Reset</button></td>
+            </tr>`;
+        });
+        document.getElementById('ownerDashboard').style.display = 'none';
+        document.getElementById('usersUpdateSection').style.display = 'block';
+    }
+
+    function hideUsers() {
+        document.getElementById('usersUpdateSection').style.display = 'none';
+        document.getElementById('ownerDashboard').style.display = 'block';
+    }
+
+    function logout() { location.reload(); }
+</script>
+</body>
+</html>
