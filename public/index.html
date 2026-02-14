@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Sri Gold Testing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #D4AF37; --dark: #1a1a1a; }
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; display: flex; flex-direction: column; align-items: center;
+            background: var(--dark) url('background.jpg') no-repeat center center fixed;
+            background-size: cover; color: white;
+        }
+        .container { 
+            width: 90%; max-width: 420px; padding: 25px; margin-top: 30px; 
+            background: rgba(0,0,0,0.85); border-radius: 15px; border: 1px solid var(--gold); 
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(8px); 
+            display: none; 
+        }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 5px; border: 1px solid #444; background: #222; color: white; box-sizing: border-box; }
+        .btn-gold { background: var(--gold); color: var(--dark); font-weight: bold; padding: 14px; width: 100%; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .btn-gold:hover { opacity: 0.8; }
+        .btn-red { background: #ff4d4d; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; }
+        table { width: 100%; margin-top: 15px; border-collapse: collapse; font-size: 0.75em; }
+        th, td { border: 1px solid var(--gold); padding: 8px; text-align: left; background: rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body>
+
+<div id="loginSection" class="container" style="display:block;">
+    <h2 style="color: var(--gold);">Sri Sri Gold Testing</h2>
+    <input type="text" id="loginUser" placeholder="Username / Mobile">
+    <input type="password" id="loginPass" placeholder="Password">
+    <button class="btn-gold" onclick="handleLogin()">Login</button>
+    <p onclick="showSection('regSection')" style="color: var(--gold); cursor: pointer; margin-top: 15px;">New User? Register Here</p>
+</div>
+
+<div id="regSection" class="container">
+    <h2 style="color: var(--gold);">Registration</h2>
+    <input type="text" id="regName" placeholder="Full Name">
+    <input type="tel" id="regMobile" placeholder="Mobile Number">
+    <input type="password" id="regPass" placeholder="Set Password">
+    <button class="btn-gold" onclick="handleRegister()">Register & Save</button>
+    <p onclick="showSection('loginSection')" style="cursor: pointer;">Back to Login</p>
+</div>
+
+<div id="custDash" class="container">
+    <h3 id="welcomeText" style="color: var(--gold);">Welcome</h3>
+    <input type="text" id="searchSN" placeholder="Enter Serial No. to find result">
+    <button class="btn-gold" onclick="findResult()">Search Result</button>
+    <div id="resDisplay" style="margin-top:10px; padding:10px; border:1px dashed var(--gold); display:none;"></div>
+    
+    <hr style="border:0.5px solid #444; margin:20px 0;">
+    <h4>Book Appointment</h4>
+    <input type="date" id="apptDate">
+    <button class="btn-gold" onclick="saveAppt()">Book Now</button>
+    
+    <textarea id="feedMsg" placeholder="Suggestions/Feedback" rows="3" style="margin-top:20px;"></textarea>
+    <button class="btn-gold" onclick="saveFeed()">Submit Feedback</button>
+    <button class="btn-gold" onclick="logout()" style="background:#444; color:white;">Logout</button>
+</div>
+
+<div id="ownerDash" class="container">
+    <h3 style="color: var(--gold);">Owner: Bhanuchand</h3>
+    <button class="btn-gold" onclick="viewUsers()">Manage Users</button>
+    <button class="btn-gold" onclick="showSection('manageResults')">Update Test Results</button>
+    <button class="btn-gold" onclick="viewAppts()">View Appointments</button>
+    <button class="btn-gold" onclick="viewFeeds()">Read Feedback</button>
+    <button class="btn-gold" onclick="logout()" style="background:#444; color:white;">Logout</button>
+</div>
+
+<div id="manageUsers" class="container" style="max-width:500px;">
+    <h3>Registered Users</h3>
+    <table id="userTable">
+        <thead><tr><th>Name</th><th>Mobile</th><th>Pass</th><th>Action</th></tr></thead>
+        <tbody id="userList"></tbody>
+    </table>
+    <button class="btn-gold" onclick="showSection('ownerDash')">Back</button>
+</div>
+
+<div id="manageResults" class="container">
+    <h3>Add Test Result</h3>
+    <input type="text" id="newSN" placeholder="Serial No.">
+    <input type="text" id="newPT" placeholder="Purity %">
+    <button class="btn-gold" onclick="saveResult()">Save Result</button>
+    <table id="resTable">
+        <thead><tr><th>Serial</th><th>Purity</th><th>Action</th></tr></thead>
+        <tbody id="resList"></tbody>
+    </table>
+    <button class="btn-gold" onclick="showSection('ownerDash')">Back</button>
+</div>
+
+<div id="viewLists" class="container">
+    <h3 id="listTitle">List</h3>
+    <table id="genericTable">
+        <thead id="listHead"></thead>
+        <tbody id="listBody"></tbody>
+    </table>
+    <button class="btn-gold" onclick="showSection('ownerDash')">Back</button>
+</div>
+
+<script>
+    let db = {
+        users: JSON.parse(localStorage.getItem('ss_users')) || [],
+        results: JSON.parse(localStorage.getItem('ss_res')) || [],
+        appts: JSON.parse(localStorage.getItem('ss_appt')) || [],
+        feeds: JSON.parse(localStorage.getItem('ss_feed')) || []
+    };
+    let currentUser = null;
+
+    function showSection(id) {
+        document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+    }
+
+    function handleRegister() {
+        const u = { name: document.getElementById('regName').value, mobile: document.getElementById('regMobile').value, pass: document.getElementById('regPass').value };
+        if(!u.name || !u.mobile || !u.pass) return alert("Fill all fields");
+        db.users.push(u);
+        localStorage.setItem('ss_users', JSON.stringify(db.users));
+        alert("Registration Successful! Please Login.");
+        showSection('loginSection');
+    }
+
+    function handleLogin() {
+        const userIn = document.getElementById('loginUser').value;
+        const passIn = document.getElementById('loginPass').value;
+        if(userIn === 'Bhanuchand' && passIn === 'Prataap') return showSection('ownerDash');
+        
+        const found = db.users.find(u => (u.name === userIn || u.mobile === userIn) && u.pass === passIn);
+        if(found) {
+            currentUser = found;
+            document.getElementById('welcomeText').innerText = "Welcome, " + found.name;
+            showSection('custDash');
+        } else alert("Invalid Credentials");
+    }
+
+    function findResult() {
+        const sn = document.getElementById('searchSN').value;
+        const found = db.results.find(r => r.sn === sn);
+        const disp = document.getElementById('resDisplay');
+        disp.style.display = 'block';
+        disp.innerHTML = found ? `<b style="color:var(--gold)">FOUND:</b> Purity ${found.pt}` : `<span style="color:red">Not Found</span>`;
+    }
+
+    function saveResult() {
+        const sn = document.getElementById('newSN').value;
+        const pt = document.getElementById('newPT').value;
+        if(!sn || !pt) return alert("Enter Serial and Purity");
+        db.results.push({sn, pt});
+        localStorage.setItem('ss_res', JSON.stringify(db.results));
+        renderResults();
+    }
+
+    function renderResults() {
+        document.getElementById('resList').innerHTML = db.results.map((r, i) => `<tr><td>${r.sn}</td><td>${r.pt}</td><td><button class="btn-red" onclick="removeItem('results','ss_res',${i},renderResults)">X</button></td></tr>`).join('');
+    }
+
+    function viewUsers() {
+        showSection('manageUsers');
+        document.getElementById('userList').innerHTML = db.users.map((u, i) => `<tr><td>${u.name}</td><td>${u.mobile}</td><td>${u.pass}</td><td><button class="btn-red" onclick="removeItem('users','ss_users',${i},viewUsers)">X</button></td></tr>`).join('');
+    }
+
+    function removeItem(key, ls, idx, cb) {
+        db[key].splice(idx, 1);
+        localStorage.setItem(ls, JSON.stringify(db[key]));
+        cb();
+    }
+
+    function saveAppt() {
+        if(!document.getElementById('apptDate').value) return;
+        db.appts.push({ name: currentUser.name, date: document.getElementById('apptDate').value });
+        localStorage.setItem('ss_appt', JSON.stringify(db.appts));
+        alert("Appointment Saved!");
+    }
+
+    function saveFeed() {
+        const msg = document.getElementById('feedMsg').value;
+        if(!msg) return;
+        db.feeds.push({ name: currentUser.name, msg });
+        localStorage.setItem('ss_feed', JSON.stringify(db.feeds));
+        alert("Feedback Sent!");
+        document.getElementById('feedMsg').value = '';
+    }
+
+    function viewAppts() {
+        showSection('viewLists'); document.getElementById('listTitle').innerText = "Appointments";
+        document.getElementById('listHead').innerHTML = `<tr><th>Customer</th><th>Date</th></tr>`;
+        document.getElementById('listBody').innerHTML = db.appts.map(a => `<tr><td>${a.name}</td><td>${a.date}</td></tr>`).join('');
+    }
+
+    function viewFeeds() {
+        showSection('viewLists'); document.getElementById('listTitle').innerText = "Customer Feedback";
+        document.getElementById('listHead').innerHTML = `<tr><th>Customer</th><th>Message</th></tr>`;
+        document.getElementById('listBody').innerHTML = db.feeds.map(f => `<tr><td>${f.name}</td><td>${f.msg}</td></tr>`).join('');
+    }
+
+    function logout() { location.reload(); }
+    renderResults();
+</script>
+</body>
+</html>
